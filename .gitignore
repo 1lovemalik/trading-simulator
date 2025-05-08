@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+trading-env/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Java
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+.mtj.tmp/
+hs_err_pid*
+target/
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+*.iws
+out/
+.gradle/
+build/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Environment variables
+.env
+.env.local
+
+# API keys and credentials
+credentials.json
+api_keys.txt
+
+# Logs
+logs/
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
