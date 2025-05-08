@@ -1,0 +1,85 @@
+## Development Assignments
+
+### Assignment 1: Basic Market Data Fetcher
+
+**Objective**: Create a simple program that retrieves stock data from a public API.
+
+**Tasks**:
+
+1. Research free financial APIs (Alpha Vantage, Yahoo Finance, etc.)
+2. Define a structure to hold stock quote information
+3. Implement a function to fetch data for a single stock symbol
+4. Parse the JSON response into your defined structure
+5. Print the results to the console
+
+**Learning Goals**:
+
+- HTTP requests in Go
+- JSON parsing
+- Error handling
+- Basic data structures
+
+### Assignment 2: Multi-Symbol Data Processor
+
+**Objective**: Extend your program to handle multiple stock symbols concurrently.
+
+**Tasks**:
+
+1. Modify your program to accept a list of stock symbols
+2. Implement concurrent data fetching using goroutines
+3. Collect results from multiple API calls
+4. Handle errors properly for each request
+5. Format and display combined results
+
+**Learning Goals**:
+
+- Concurrency with goroutines
+- Synchronization with WaitGroups
+- Working with slices and maps
+
+### Assignment 3: Periodic Data Collection
+
+**Objective**: Transform your program into a service that collects data at regular intervals.
+
+**Tasks**:
+
+1. Set up a timer to trigger data collection periodically
+2. Implement graceful shutdown handling
+3. Add logging to track operations
+4. Create a simple mechanism to store collected data
+5. Implement basic error recovery and retries
+
+**Learning Goals**:
+
+- Working with time and timers in Go
+- Service design patterns
+- Basic persistence strategies
+- Signal handling
+
+### Assignment 4: Data Normalization and Processing
+
+**Objective**: Enhance your service to process and normalize data from different sources.
+
+**Tasks**:
+
+1. Add support for a second data source/API
+2. Create adapter functions to normalize data from different sources
+3. Implement filtering for invalid or missing data
+4. Add calculation of basic technical indicators (e.g., moving averages)
+5. Structure the data for consumption by other system components
+
+**Learning Goals**:
+
+- Interface design
+- Data transformation patterns
+- Basic financial calculations
+- Modular code organization
+
+## Getting Started
+
+For Assignment 1, begin by:
+
+1. Researching the Alpha Vantage API documentation
+2. Understanding the structure of their Global Quote endpoint
+3. Sketching out the Go structures needed to represent this data
+4. Planning your HTTP request function
