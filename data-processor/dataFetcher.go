@@ -10,7 +10,7 @@ import (
 	_ "github.com/joho/godotenv"
 )
 
-var client = &http.Client{Timeout: 10 * time.Second}
+var Client = &http.Client{Timeout: 10 * time.Second}
 var NinjaAPIKey string
 
 func takeInputs() (string, error) {
@@ -21,6 +21,8 @@ func takeInputs() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("bad Input! Error: %v", err)
 	}
+
+	InputChecker(input)
 
 	url, exists := CommandMap["Current Price"]
 	if !exists {
@@ -38,10 +40,15 @@ func MakeCurrPriceReq(url string) error {
 	}
 
 	req.Header.Add("X-API-KEY", NinjaAPIKey)
-	response, err := client.Do(req)
+	response, err := Client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to complete request. Err: %v", err)
+	}
 
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("API returned non-OK status: %d, %s", response.StatusCode, response.Status)
 	}
 
 	resBody, err := io.ReadAll(response.Body)

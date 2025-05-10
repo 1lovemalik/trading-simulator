@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 func main() {
 	loadEnv()
@@ -11,5 +14,8 @@ func main() {
 		takeInputs()
 	}
 
-	MakeCurrPriceReq(input)
+	err = MakeCurrPriceReq(input)
+	if err != nil {
+		log.Printf("failed to Get Current Price of stock. Err: %v", err)
+	}
 }
