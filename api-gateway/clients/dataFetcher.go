@@ -1,4 +1,4 @@
-package main
+package clients
 
 import (
 	"encoding/json"
@@ -6,14 +6,12 @@ import (
 	"io"
 	"net/http"
 	"time"
+	"trading-simulator/api-gateway/util"
 
 	_ "github.com/joho/godotenv"
 )
 
-var Client = &http.Client{Timeout: 10 * time.Second}
-var NinjaAPIKey string
-
-func takeInputs() (string, error) {
+func TakeInputs() (string, error) {
 	fmt.Print("Enter the ticker symbol of the stock that you want!")
 
 	var input string
@@ -22,7 +20,7 @@ func takeInputs() (string, error) {
 		return "", fmt.Errorf("bad Input! Error: %v", err)
 	}
 
-	InputChecker(input)
+	util.InputChecker(input)
 
 	url, exists := CommandMap["Current Price"]
 	if !exists {
@@ -32,6 +30,9 @@ func takeInputs() (string, error) {
 	url += input
 	return url, nil
 }
+
+var Client = &http.Client{Timeout: 10 * time.Second}
+var NinjaAPIKey string
 
 func MakeCurrPriceReq(url string) (*CurrPrice, error) {
 	req, err := http.NewRequest("GET", url, nil)
@@ -68,7 +69,7 @@ func MakeCurrPriceReq(url string) (*CurrPrice, error) {
 }
 
 func getHistoricalStockPrices(tickerName string) ([]HistoricStockPrices, error) {
-	err := InputChecker(tickerName)
+	err := util.InputChecker(tickerName)
 	if err != nil {
 		return nil, fmt.Errorf("Bad Ticker Name. Err: %s", err)
 	}
@@ -79,32 +80,32 @@ func getHistoricalStockPrices(tickerName string) ([]HistoricStockPrices, error) 
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to make new request. Err: %s", err)
+		return nil, fmt.Errorf("failed to make new request. Err: %s", err)
 	}
 
 	req.Header.Add("X-API-KEY", NinjaAPIKey)
 
 	response, err := Client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to execute get request. Err: %s", err)
+		return nil, fmt.Errorf("failed to execute get request. Err: %s", err)
 	}
 
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Bad status code; %v, Body: %s", response.StatusCode, response.Body)
+		return nil, fmt.Errorf("bad status code; %v, Body: %s", response.StatusCode, response.Body)
 	}
 
 	jsonArray, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to read from response Body: %s", err)
+		return nil, fmt.Errorf("failed to read from response Body: %s", err)
 	}
 
 	var PricesArray []HistoricStockPrices
 
 	err = json.Unmarshal(jsonArray, &PricesArray)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to Unmarshal from Json. Err: %s", err)
+		return nil, fmt.Errorf("failed to Unmarshal from Json. Err: %s", err)
 	}
 
 	return PricesArray, nil
