@@ -1,7 +1,9 @@
 package routes
 
+import "github.com/google/uuid"
+
 type Portfolio struct {
-	OwnerID string             `json:"owner-id"`
+	ID      string             `json:"owner-id"`
 	Name    string             `json:"name"`
 	Stocks  map[string]float32 `json:"stocks"`
 	Balance float32            `json:"balance"`
@@ -9,7 +11,7 @@ type Portfolio struct {
 
 func (u User) newPortfolio(name string) *Portfolio {
 	p := Portfolio{
-		OwnerID: u.ID,
+		ID:      uuid.NewString(),
 		Name:    name,
 		Stocks:  make(map[string]float32),
 		Balance: 0,
