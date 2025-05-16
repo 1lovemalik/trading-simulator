@@ -16,14 +16,14 @@ CREATE TABLE stocks (
     id SERIAL PRIMARY KEY,
     ticker_name TEXT,
     quantity INTEGER,
-    portfolio_id TEXT REFERENCES portfolios(id) ON DELETE CASCADE
+    portfolio_id TEXT REFERENCES portfolios(id) ON DELETE CASCADE,
     UNIQUE(ticker_name, portfolio_id)  -- Prevents duplicates per portfolio
 );
 
 CREATE TABLE trades (
     id SERIAL PRIMARY KEY,
     trade_type TEXT NOT NULL,
-    execution_time TIME NOT NULL
+    execution_time TIMESTAMP NOT NULL,
     ticker_name TEXT,
-    portfolio_id TEXT REFERENCES portfolio(id)
+    portfolio_id TEXT REFERENCES portfolios(id)
 );

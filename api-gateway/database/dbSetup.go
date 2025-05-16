@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
@@ -17,6 +16,7 @@ type DBConn struct {
 	User     string
 	Port     int
 	Password string
+	Host     string
 }
 
 func loadDB() (*DBConn, error) {
@@ -24,6 +24,7 @@ func loadDB() (*DBConn, error) {
 		Name:     os.Getenv("DB_NAME"),
 		User:     os.Getenv("DB_USER"),
 		Password: os.Getenv("DB_PASS"),
+		Host:     os.Getenv("DB_HOST"),
 	}
 
 	portString := os.Getenv("DB_PORT")
@@ -34,7 +35,7 @@ func loadDB() (*DBConn, error) {
 
 	p.Port = port
 
-	if p.Name == "" || p.User == "" || p.Password == "" {
+	if p.Name == "" || p.User == "" || p.Password == "" || p.Host == "" {
 		return nil, fmt.Errorf("cannot have null fields! p.Name = %v, p.User = %v, p.Password = %v",
 			p.Name, p.User, p.Password)
 	}
@@ -48,24 +49,35 @@ func ConnectDB() (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to load db conn vals: %v", err)
 	}
 
-	connString := fmt.Sprintf("user=%v password=%v dbname=%v port=%v sslmode=disable",
+	connString := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=disable", connVals.Host,
 		connVals.User, connVals.Password, connVals.Name, connVals.Port)
 
 	dbConn, err := sql.Open("postgres", connString)
 	if err != nil {
-		log.Fatalf("failed to connect to db: %v", err)
 		return nil, fmt.Errorf("failed to connect to db: %v", err)
 	}
 
-	defer db.Close()
-
 	db = dbConn
+
+	err = db.Ping()
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to db. err : ", err)
+	}
 
 	return db, nil
 }
 
 func DBInit() error {
-	filepath := "schema.sql"
+	tablesExist, err := tablesExists(db)
+	if err != nil {
+		return fmt.Errorf("Failed to check if tables existed, err: ", err)
+	}
+
+	if tablesExist {
+		return nil
+	}
+
+	filepath := "database/schema.sql"
 
 	file, err := os.ReadFile(filepath)
 	if err != nil {
@@ -81,5 +93,25 @@ func DBInit() error {
 		return fmt.Errorf("failed to run db exec. query: %v, err: %v", query, err)
 	}
 
+	fmt.Print("Successfully connected to db")
+
 	return nil
+}
+
+func tablesExists(db *sql.DB) (bool, error) {
+	query := `SELECT COUNT(*) FROM information_schema.tables`
+
+	result := db.QueryRow(query)
+	var count int
+
+	err := result.Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("failed to scan rows into var, err: ", err)
+	}
+
+	if count > 0 {
+		return true, nil
+	}
+
+	return false, nil
 }
