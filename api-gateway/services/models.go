@@ -1,11 +1,15 @@
-package clients
+package services
 
-import "fmt"
+import (
+	"fmt"
+)
 
-var CommandMap = map[string]string{
-	"Current Price": "https://api.api-ninjas.com/v1/stockprice?ticker=",
+type Portfolio struct {
+	ID      string             `json:"owner-id"`
+	Name    string             `json:"name"`
+	Stocks  map[string]float32 `json:"stocks"`
+	Balance float32            `json:"balance"`
 }
-
 type CurrPrice struct {
 	Ticker   string  `json:"ticker"`
 	Name     string  `json:"name"`
@@ -22,6 +26,14 @@ type HistoricStockPrices struct {
 	Close  float64 `json:"close"`
 	Volume int64   `json:"volume"`
 	Time   int64   `json:"time"`
+}
+
+type User struct {
+	ID         string      `json:"id"`
+	Name       string      `json:"name"`
+	Portfolios []Portfolio `json:"portfolios"`
+	Email      string      `json:"email"`
+	Password   string      `json:"password"`
 }
 
 func (c CurrPrice) ToString() {

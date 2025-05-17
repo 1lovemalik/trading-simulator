@@ -1,4 +1,4 @@
-package clients
+package services
 
 import (
 	"encoding/json"
@@ -11,8 +11,12 @@ import (
 	_ "github.com/joho/godotenv"
 )
 
+var CommandMap = map[string]string{
+	"Current Price": "https://api.api-ninjas.com/v1/stockprice?ticker=",
+}
+
 func TakeInputs() (string, error) {
-	fmt.Print("Enter the ticker symbol of the stock that you want!")
+	fmt.Println("Enter the ticker symbol of the stock that you want!")
 
 	var input string
 	_, err := fmt.Scan(&input)
@@ -20,21 +24,19 @@ func TakeInputs() (string, error) {
 		return "", fmt.Errorf("bad Input! Error: %v", err)
 	}
 
-	util.InputChecker(input)
-
-	url, exists := CommandMap["Current Price"]
-	if !exists {
-		url = "https://api.api-ninjas.com/v1/stockprice?ticker="
-		CommandMap["Current Price"] = url
+	err = util.InputChecker(input)
+	if err != nil {
+		return "", fmt.Errorf("this is not valid input!: err: %v", err)
 	}
-	url += input
-	return url, nil
+
+	return input, nil
 }
 
 var Client = &http.Client{Timeout: 10 * time.Second}
 var NinjaAPIKey string
 
-func MakeCurrPriceReq(url string) (*CurrPrice, error) {
+func MakeCurrPriceReq(input string) (*CurrPrice, error) {
+	url := fmt.Sprintf("https://api.api-ninjas.com/v1/stockprice?ticker=%v", input)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make request: %v", err)
@@ -57,18 +59,14 @@ func MakeCurrPriceReq(url string) (*CurrPrice, error) {
 		return nil, fmt.Errorf("failed to read response body: %v", err)
 	}
 
-	var currPriceStruct CurrPrice
-
-	err = json.Unmarshal(resBody, &currPriceStruct)
+	prices, err := GetCurrStockData(resBody)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal json object. Err: %v", err)
+		return nil, fmt.Errorf("get current stock data service raised err: %v", err)
 	}
-
-	currPriceStruct.ToString()
-	return &currPriceStruct, nil
+	return prices, nil
 }
 
-func getHistoricalStockPrices(tickerName string) ([]HistoricStockPrices, error) {
+func GetHistoricalStockPrices(tickerName string) ([]HistoricStockPrices, error) {
 	err := util.InputChecker(tickerName)
 	if err != nil {
 		return nil, fmt.Errorf("Bad Ticker Name. Err: %s", err)

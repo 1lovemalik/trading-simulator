@@ -5,8 +5,7 @@ import (
 	"log"
 	"os"
 	"trading-simulator/api-gateway/database"
-
-	"trading-simulator/api-gateway/clients"
+	"trading-simulator/api-gateway/services"
 
 	"github.com/joho/godotenv"
 )
@@ -14,27 +13,22 @@ import (
 func main() {
 	LoadEnv()
 
-	_, err := database.ConnectDB()
+	err := SetupRepositories()
 	if err != nil {
-		log.Fatalf("failed to connect to db, err: ", err)
-	}
-
-	err = database.DBInit()
-	if err != nil {
-		log.Fatalf("failed to create/load db, err: ", err)
+		log.Fatal(err.Error())
 	}
 
 	running := true
 
 	for running {
 
-		input, err := clients.TakeInputs()
+		input, err := services.TakeInputs()
 		if err != nil {
 			fmt.Println("This is Bad input!")
-			clients.TakeInputs()
+			services.TakeInputs()
 		}
 
-		_, err = clients.MakeCurrPriceReq(input)
+		_, err = services.MakeCurrPriceReq(input)
 		if err != nil {
 			log.Printf("failed to Get Current Price of stock. Err: %v", err)
 		}
@@ -49,5 +43,25 @@ func LoadEnv() {
 		log.Fatalf("Error loading .env file: %s", err)
 	}
 
-	clients.NinjaAPIKey = os.Getenv("API_NINJAS_API_KEY")
+	services.NinjaAPIKey = os.Getenv("API_NINJAS_API_KEY")
+}
+
+func SetupRepositories() error {
+
+	_, err := database.ConnectDB()
+	if err != nil {
+		log.Fatalf("failed to connect to db, err: ", err)
+	}
+
+	err = database.DBInit()
+	if err != nil {
+		log.Fatalf("failed to create/load db, err: ", err)
+	}
+
+	_, err = database.InitRedis()
+	if err != nil {
+		log.Fatalf("failed to set up redis client, err: %v", err)
+	}
+
+	return nil
 }

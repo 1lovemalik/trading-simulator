@@ -61,7 +61,7 @@ func ConnectDB() (*sql.DB, error) {
 
 	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to db. err : ", err)
+		return nil, fmt.Errorf("failed to connect to db. err %v: ", err)
 	}
 
 	return db, nil
@@ -106,7 +106,7 @@ func tablesExists(db *sql.DB) (bool, error) {
 
 	err := result.Scan(&count)
 	if err != nil {
-		return false, fmt.Errorf("failed to scan rows into var, err: ", err)
+		return false, fmt.Errorf("failed to scan rows into var, err: %v", err)
 	}
 
 	if count > 0 {
